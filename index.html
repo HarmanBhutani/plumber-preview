@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lead Capture Preview</title>
+<style>
+  :root{--brand:#14507a;--brand-dark:#0d3a5a;--bg:#f4f7fa;--card:#fff;--text:#1c2733;--muted:#5b6b7a;--line:#d6e0e9;--bot:#e8f0f7;--ok:#1d7a46}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
+  .banner{background:#fff7e0;border-bottom:1px solid #ecd9a0;padding:8px 16px;font-size:13px;text-align:center}
+  header.site{background:var(--brand);color:#fff;padding:18px 24px}
+  header.site h1{margin:0;font-size:20px}
+  header.site p{margin:2px 0 0;font-size:13px;opacity:.85}
+  main{max-width:900px;margin:0 auto;padding:24px 16px 140px}
+  main h2{font-size:18px;margin-bottom:6px}
+  main p{color:var(--muted);line-height:1.5;margin-top:0}
+  .owner{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:20px;max-width:420px}
+  .owner h3{margin:0 0 4px;font-size:15px}
+  .owner small{color:var(--muted)}
+  .sms{background:#e9f7ee;border:1px solid #b9dfc7;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+  .empty{color:var(--muted);font-size:13px;margin-top:10px}
+  .launcher{position:fixed;right:20px;bottom:20px;background:var(--brand);color:#fff;border:0;border-radius:28px;padding:14px 20px;font-size:15px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+  .chat{position:fixed;right:20px;bottom:80px;width:370px;max-width:calc(100vw - 24px);height:580px;max-height:calc(100vh - 100px);background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden}
+  .chat.open{display:flex}
+  .chat-head{background:var(--brand);color:#fff;padding:12px 14px}
+  .chat-head b{display:block;font-size:15px}
+  .status{font-size:12px;opacity:.9}
+  .msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .m{max-width:88%;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.45;white-space:pre-wrap}
+  .m.bot{background:var(--bot);align-self:flex-start}
+  .m.me{background:var(--brand);color:#fff;align-self:flex-end}
+  .act{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+  .act a,.act button{background:#fff;border:1px solid var(--brand);color:var(--brand-dark);text-decoration:none;padding:6px 10px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit}
+  .lead{align-self:stretch;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;font-size:13px}
+  .lead label{display:block;margin:8px 0 3px;font-weight:600}
+  .lead input[type=text],.lead input[type=tel],.lead textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px;font-size:14px;font-family:inherit}
+  .lead textarea{height:60px;resize:none}
+  .lead .consent{display:flex;gap:8px;align-items:flex-start;margin-top:10px;font-weight:400;color:var(--muted)}
+  .lead .send{margin-top:10px;width:100%;background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px;font-size:14px;cursor:pointer}
+  .lead .err{color:#b3261e;margin-top:6px;min-height:16px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px}
+  .chips button{background:#fff;border:1px solid var(--line);border-radius:16px;padding:6px 10px;font-size:12.5px;cursor:pointer;color:var(--text)}
+  form.bar{display:flex;border-top:1px solid var(--line)}
+  form.bar input{flex:1;border:0;padding:12px;font-size:14px;outline:none}
+  form.bar button{border:0;background:var(--brand);color:#fff;padding:0 16px;cursor:pointer;font-size:14px}
+  .foot{font-size:11px;color:var(--muted);padding:6px 12px;border-top:1px solid var(--line);background:#fafcfd}
+</style>
+</head>
+<body>
+<div class="banner">PREVIEW ONLY. "Northside Plumbing" is a fictional business. Nothing you enter is sent or saved.</div>
+<header class="site"><h1 id="siteName"></h1><p id="siteTag"></p></header>
+<main>
+  <h2>How this preview works</h2>
+  <p>Open the chat at the bottom right and act as a customer. Ask a question, then request a callback. The box below shows the text message the owner would receive straight away.</p>
+  <div class="owner">
+    <h3>Owner's phone</h3>
+    <small>What you would receive for each new lead</small>
+    <div id="ownerBox"><div class="empty">No leads yet. Request a callback in the chat to see one.</div></div>
+  </div>
+</main>
+
+<button class="launcher" id="launcher">Need a plumber? Chat with us</button>
+<section class="chat" id="chat" aria-label="Website assistant">
+  <div class="chat-head"><b id="chatName"></b><span class="status" id="status"></span></div>
+  <div class="msgs" id="msgs" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form class="bar" id="form"><input id="input" autocomplete="off" placeholder="Type your question…" aria-label="Your question"><button>Send</button></form>
+  <div class="foot">Preview only. Nothing you type is sent or saved.</div>
+</section>
+
+<script>
+/* ---------- BUSINESS SETTINGS: replace for each real business ---------- */
+const BIZ = {
+  name: "Northside Plumbing",
+  tagline: "Licensed plumbers serving Toronto and the GTA (sample)",
+  phone: "416-555-0142",
+  area: "Sample answer: we serve Toronto, North York, Etobicoke, Scarborough and Mississauga.",
+  // 0 = Sunday ... 6 = Saturday; [open, close] in 24h clock, null = closed
+  hours: {0:null,1:[8,18],2:[8,18],3:[8,18],4:[8,18],5:[8,18],6:[9,14]},
+  hoursText: "Monday to Friday: 8 am to 6 pm\nSaturday: 9 am to 2 pm\nSunday: closed\nEmergency calls are returned as soon as possible.",
+  faqs: [
+    {id:"hours", keys:["hour","open","close","when are you","weekend","saturday","sunday"], q:"What are your hours?", a:"Our hours are:\n{HOURS}"},
+    {id:"area", keys:["area","serve","service area","come to","location","where","mississauga","scarborough","etobicoke","north york","brampton","vaughan","markham"], q:"What areas do you serve?", a:"{AREA} If you are just outside these areas, leave your details and we will confirm."},
+    {id:"services", keys:["service","do you do","fix","repair","install","drain","clog","toilet","faucet","tap","water heater","hot water","sump","pipe","sewer","backwater","renovat"], q:"What services do you offer?", a:"Sample answer: drain cleaning, leak repair, toilets and faucets, water heaters, sump pumps, and pipe replacement. Leave a short description of the job and we will call you back about it."},
+    {id:"price", weight:2, keys:["price","cost","how much","quote","estimate","rate","charge","fee"], q:"How much does it cost?", a:"Every job is different, so we give a quote after a short conversation or a visit. Leave your details and we will call you back with a price."},
+    {id:"licence", keys:["licen","insured","insurance","warranty","guarantee","certified"], q:"Are you licensed and insured?", a:"Sample answer: yes, our plumbers are licensed and we are fully insured. We stand behind our work."},
+    {id:"emergency", weight:3, keys:["emergency","urgent","burst","flood","leak","no water","overflow","asap","right now","tonight"], q:"I have an emergency", urgent:true, a:"If water is flowing and you can safely reach your main shut-off valve, turn it off. If you smell gas, leave the building and call your gas company or 911.\n\nLeave your number below and mark it urgent. We will call you back as soon as possible."}
+  ],
+  chips: ["emergency","price","area","hours"]
+};
+
+/* ---------- PROSPECT PREVIEWS: open index.html?biz=KEY ----------
+   Only the name, phone and service area come from each business's own website.
+   Everything else stays as sample text until the owner confirms it. */
+const NOHOURS = "Please call us for our current hours. You can leave a request here at any time.";
+const PROSPECTS = {};
+const KEY = new URLSearchParams(location.search).get("biz") || location.hash.slice(1);
+if(PROSPECTS[KEY]) Object.assign(BIZ, {hours:null, hoursText:NOHOURS, tagline:"Preview of a website assistant", prospect:true}, PROSPECTS[KEY]);
+
+const $ = id => document.getElementById(id);
+const msgs = $("msgs");
+const fmt = h => (h%12||12)+(h>=12?" pm":" am");
+function status(){
+  if(!BIZ.hours) return {open:false, unknown:true, note:"Leave your details any time and we will call you back."};
+  const now = new Date(new Date().toLocaleString("en-US",{timeZone:"America/Toronto"}));
+  const h = BIZ.hours[now.getDay()];
+  const t = now.getHours()+now.getMinutes()/60;
+  if(h && t>=h[0] && t<h[1]) return {open:true, note:"Open now until "+fmt(h[1])};
+  return {open:false, note:"Closed right now. Leave a message and we will call back."};
+}
+function add(text, who, node){
+  const d = document.createElement("div"); d.className="m "+who; d.textContent=text;
+  if(node) d.appendChild(node);
+  msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return d;
+}
+function actions(urgent){
+  const w = document.createElement("div"); w.className="act";
+  const b = document.createElement("button"); b.type="button"; b.textContent="Request a callback"; b.onclick=()=>leadForm(urgent);
+  const a = document.createElement("a"); a.href="tel:"+BIZ.phone.replace(/\D/g,""); a.textContent="Call "+BIZ.phone;
+  w.append(b,a); return w;
+}
+let lastQuestion = "";
+function leadForm(urgent){
+  if(document.querySelector(".lead")) { document.querySelector(".lead input").focus(); return; }
+  const f = document.createElement("form"); f.className="lead"; f.noValidate=true;
+  f.innerHTML = `
+    <b>Request a callback</b>
+    <label for="ln">Name</label><input id="ln" type="text" autocomplete="off">
+    <label for="lp">Phone number</label><input id="lp" type="tel" autocomplete="off" placeholder="416-555-0100">
+    <label for="lj">What do you need help with?</label><textarea id="lj"></textarea>
+    <label class="consent"><input id="lu" type="checkbox" ${urgent?"checked":""}> <span>This is urgent</span></label>
+    <label class="consent"><input id="lc" type="checkbox"> <span>I agree that ${BIZ.name} may call or text me at this number about this request.</span></label>
+    <div class="err" id="le"></div>
+    <button class="send">Send request</button>`;
+  msgs.appendChild(f); msgs.scrollTop=msgs.scrollHeight;
+  f.querySelector("#lj").value = lastQuestion;
+  f.querySelector("#ln").focus();
+  f.onsubmit = e => {
+    e.preventDefault();
+    const name=f.querySelector("#ln").value.trim(), phone=f.querySelector("#lp").value.trim(), job=f.querySelector("#lj").value.trim();
+    const digits = phone.replace(/\D/g,"");
+    const err = f.querySelector("#le");
+    if(!name) return err.textContent="Please enter your name.";
+    if(digits.length<10 || digits.length>11) return err.textContent="Please enter a 10-digit phone number.";
+    if(!f.querySelector("#lc").checked) return err.textContent="Please tick the box so we may contact you.";
+    const urgentNow = f.querySelector("#lu").checked;
+    f.remove();
+    const s = status();
+    add("Thank you, "+name+". "+(urgentNow ? "We have marked this as urgent and will call you as soon as possible."
+        : (s.open||s.unknown) ? "We will call you back shortly." : "We are closed right now and will call you back when we open."), "bot");
+    ownerText({name, phone, job, urgent:urgentNow, open:s.open||s.unknown});
+  };
+}
+function ownerText(l){
+  const t = new Date().toLocaleString("en-CA",{timeZone:"America/Toronto",weekday:"short",hour:"numeric",minute:"2-digit"});
+  const box = $("ownerBox");
+  if(box.querySelector(".empty")) box.innerHTML="";
+  const d = document.createElement("div"); d.className="sms";
+  d.textContent = (l.urgent?"URGENT ":"")+"New lead from your website\n"+l.name+" · "+l.phone+"\nJob: "+(l.job||"(not given)")+"\nReceived: "+t+(l.open?"":" (after hours)")+"\nCustomer agreed to a call or text.";
+  box.prepend(d);
+}
+function answer(text){
+  const t = text.toLowerCase();
+  let best=null, score=0;
+  for(const f of BIZ.faqs){ let s=0; for(const k of f.keys) if(t.includes(k)) s+= k.length>5?2:1; s*=(f.weight||1); if(s>score){score=s;best=f;} }
+  if(!best){ add("We do not have an answer to that here, but we would be glad to help. Leave your details and we will call you back.","bot",actions(false)); return; }
+  add(best.a.replace("{HOURS}",BIZ.hoursText).replace("{AREA}",BIZ.area),"bot",actions(!!best.urgent));
+}
+function ask(text){ text=text.trim(); if(!text) return; lastQuestion=text; add(text,"me"); setTimeout(()=>answer(text),350); }
+
+$("siteName").textContent=BIZ.name;
+if(BIZ.prospect) document.querySelector(".banner").textContent = "PREVIEW prepared for "+BIZ.name+". This is not the official "+BIZ.name+" website. Answers marked \"Sample\" are placeholders. Nothing you enter is sent or saved."; $("siteTag").textContent=BIZ.tagline;
+$("chatName").textContent=BIZ.name; $("status").textContent=status().note;
+for(const id of BIZ.chips){ const f=BIZ.faqs.find(x=>x.id===id); const b=document.createElement("button"); b.type="button"; b.textContent=f.q; b.onclick=()=>ask(f.q); $("chips").appendChild(b); }
+add("Hello. Tell us what you need, or ask a question. If you would like a call back, we will take your name and number.","bot",actions(false));
+$("launcher").onclick=()=>{ $("chat").classList.toggle("open"); if($("chat").classList.contains("open")) $("input").focus(); };
+$("form").onsubmit=e=>{ e.preventDefault(); const v=$("input").value; $("input").value=""; ask(v); };
+</script>
+</body>
+</html>
